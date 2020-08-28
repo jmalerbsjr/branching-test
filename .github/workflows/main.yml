@@ -6,23 +6,27 @@ name: Release Versioning
 on:
   push:
     branches: [ development ]
-  pull_request:
-    branches: [ development ]
 
 jobs:
   hello_world_job:
     runs-on: ubuntu-latest
     name: A job to say hello
     steps:
-      # To use this repository's private action,
-      # you must check out the repository
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Hello world action step
+
+      - name: Docker Action
         uses: ./ # Uses an action in the root directory
         id: hello
         with:
-          who-to-greet: 'Mona the Octocat'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
       # Use the output from the `hello` step
-      - name: Get the output time
-        run: echo "The time was ${{ steps.hello.outputs.time }}"
+      - name: Bump Version
+        run: |
+          echo "New Version: ${{ steps.hello.outputs.tag_new }}"
+
+#          git describe --tags $(git rev-list --tags --max-count=1)
+#          echo "The time was ${{ steps.hello.outputs.time }}"
+#::set-env name={name}::{value}
+#echo "::set-output name=action_fruit::strawberry"
+#echo "::add-path::/path/to/dir"

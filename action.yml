@@ -2,7 +2,7 @@
 name: 'Hello World'
 description: 'Greet someone and record the time'
 inputs:
-  myInput:  # id of input
+  repo-token:  # id of input
     description: 'Who to greet'
     required: true
 outputs:

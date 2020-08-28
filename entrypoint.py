@@ -177,7 +177,7 @@ repo.create_git_tag_and_release(tag=semver.tag_next,
                                 type='commit',
                                 prerelease=True)
 
-print('New tag: {0}\nSHA: {1}\nOn Branch: {2}'.format(semver.tag_latest,
+print('New tag: {0}\nSHA: {1}\nOn Branch: {2}'.format(semver.tag_next,
                                                       git_branch.commit.sha,
                                                       semver.dest_branch))
 exit(0)

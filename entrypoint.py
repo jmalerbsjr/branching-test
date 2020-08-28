@@ -160,7 +160,6 @@ g = Github(base_url="https://api.github.com", login_or_token=mh_config.github_ap
 # Get tags from GitHub as a list
 print("----")
 # https://stackoverflow.com/questions/11801983/how-to-create-a-commit-and-push-into-repo-with-github-api-v3
-print('Pushing new tag: {0}'.format(semver.tag_next))
 repo = g.get_user().get_repo(semver.repo_name)
 # repo.create_git_ref(ref='refs/heads/feat_test', sha='445f095c664c16e674054ed6db2d13678593ac1c')
 

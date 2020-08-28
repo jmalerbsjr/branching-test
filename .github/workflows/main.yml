@@ -15,7 +15,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Docker Action
+      - name: Docker Bump Version
         uses: ./ # Uses an action in the root directory
         id: hello
         with:

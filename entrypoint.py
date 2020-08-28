@@ -187,14 +187,15 @@ semver.tag_next = semver_bump(tag_latest=semver.tag_latest,
                               tag_suffix=semver.tag_suffix)
 print("::set-output name=tag_new::{0}".format(semver.tag_next))
 
-# push_github_tag(repo_name=semver.repo_name,
-#                 dest_branch=semver.dest_branch,
-#                 tag_next=semver.tag_next,
-#                 gh_api=gh_api)
+push_github_tag(repo_name=semver.repo_name,
+                dest_branch=semver.dest_branch,
+                tag_next=semver.tag_next,
+                gh_api=gh_api)
 
 
 '''
 TODO:
 - Master, hotfix branches
 - PR checkbox to bump MAJOR, MINOR
+- Flag prerelease or real release
 '''

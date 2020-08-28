@@ -16,8 +16,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/.github/workflows/main.yml">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="357">
-              <caret line="21" column="58" selection-start-line="21" selection-start-column="58" selection-end-line="21" selection-end-column="58" />
+            <state relative-caret-position="374">
+              <caret line="22" column="21" selection-start-line="22" selection-start-column="21" selection-end-line="22" selection-end-column="21" />
             </state>
           </provider>
         </entry>
@@ -25,8 +25,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/entrypoint.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="54">
-              <caret line="121" column="71" selection-start-line="121" selection-start-column="71" selection-end-line="121" selection-end-column="71" />
+            <state relative-caret-position="440">
+              <caret line="188" column="34" selection-start-line="188" selection-start-column="34" selection-end-line="188" selection-end-column="34" />
             </state>
           </provider>
         </entry>
@@ -60,7 +60,6 @@
       <find>-test</find>
       <find>src</find>
       <find>latest tag</find>
-      <find>position</find>
       <find>repo</find>
       <find>src_branch</find>
       <find>create_</find>
@@ -72,6 +71,10 @@
       <find>token</find>
       <find>os.environ</find>
       <find>get tags from</find>
+      <find>position</find>
+      <find>bump</find>
+      <find>Bump Version</find>
+      <find>set_semver_position</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -215,6 +218,13 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/entrypoint.py</url>
+          <line>71</line>
+          <option name="timeStamp" value="15" />
+        </line-breakpoint>
+      </breakpoints>
       <default-breakpoints>
         <breakpoint type="python-exception">
           <properties notifyOnTerminate="true" exception="BaseException">
@@ -283,15 +293,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/entrypoint.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="54">
-          <caret line="121" column="71" selection-start-line="121" selection-start-column="71" selection-end-line="121" selection-end-column="71" />
+        <state relative-caret-position="440">
+          <caret line="188" column="34" selection-start-line="188" selection-start-column="34" selection-end-line="188" selection-end-column="34" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/.github/workflows/main.yml">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="357">
-          <caret line="21" column="58" selection-start-line="21" selection-start-column="58" selection-end-line="21" selection-end-column="58" />
+        <state relative-caret-position="374">
+          <caret line="22" column="21" selection-start-line="22" selection-start-column="21" selection-end-line="22" selection-end-column="21" />
         </state>
       </provider>
     </entry>

@@ -49,7 +49,7 @@ def get_github_tags(repo_name=None):
     git_tags = repo.get_tags()
     return [tag.name for tag in git_tags]
 
-def set_semver_position():
+def get_semver_position():
     # Determine which semantic position to bump
     if semver.dest_branch == 'development':
         semver.position = 'MINOR'
@@ -146,7 +146,7 @@ tags = get_github_tags(repo_name=semver.repo_name)
 get_latest_tag(git_tags=tags, dest_branch=semver.dest_branch)
 
 # Figure out which semantic position to bump
-set_semver_position()
+get_semver_position()
 
 # Generate new tag
 semver_bump(semver=semver)
@@ -168,19 +168,18 @@ repo = g.get_user().get_repo(semver.repo_name)
 git_branch = repo.get_branch(branch=semver.dest_branch)
 
 # Push next tag
-print('SHA:', git_branch.commit.sha)
-# repo.create_git_tag_and_release(tag=semver.tag_next,
-#                                 tag_message='Test Message',
-#                                 release_name='Test Release Name',
-#                                 release_message='Test Release Message',
-#                                 object=git_branch.commit.sha,
-#                                 type='commit',
-#                                 prerelease=True)
 
+repo.create_git_tag_and_release(tag=semver.tag_next,
+                                tag_message='Test Message',
+                                release_name='Test Release Name',
+                                release_message='Test Release Message',
+                                object=git_branch.commit.sha,
+                                type='commit',
+                                prerelease=True)
 
-#
-#
-# print('Latest tag: {0}'.format(semver.tag_latest))
+print('New tag: {0}\nSHA: {1}\nOn Branch: {2}'.format(semver.tag_latest,
+                                                      git_branch.commit.sha,
+                                                      semver.dest_branch))
 exit(0)
 
 
@@ -188,5 +187,4 @@ exit(0)
 TODO:
 - Master, hotfix branches
 - PR checkbox to bump MAJOR, MINOR
-- Bump tag on MERGE only
 '''

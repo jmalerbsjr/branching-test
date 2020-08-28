@@ -119,7 +119,7 @@ def mh_config(mode='live'):
 
     if mode == 'live':
         print("Loading config from Github Secrets")
-        mh_config_model.github_api_token = os.environ["INPUT_API_KEY_REPO_BRANCH_TEST"]
+        mh_config_model.github_api_token = os.environ["INPUT_REPO-TOKEN"]
 
 
     return mh_config_model

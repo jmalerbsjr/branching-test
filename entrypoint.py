@@ -157,7 +157,7 @@ src_branch = "feature_branch"     # Ex: feat_branch
 dest_branch = 'development'
 
 # Set mode: Local (local config) or Live (GitHub Secrets)
-mh_config = mh_config(mode='local')
+mh_config = mh_config(mode='live')
 
 # Instantiate GitHub connection object
 gh_api = connect_github(api_token=mh_config.github_api_token)

@@ -20,9 +20,6 @@ jobs:
         id: hello
         with:
           repo-token: ${{ secrets.API_KEY_REPO_BRANCH_TEST }}
-          key: cache-docker-image
-          path: |
-            Dockerfile
       # Use the output from the `hello` step
 #      - name: Bump Version
 #        run: |

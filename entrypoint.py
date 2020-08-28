@@ -87,6 +87,7 @@ def semver_bump(semver):
         MAJOR = MAJOR + 1
     elif semver.position == 'MINOR':
         MINOR = MINOR + 1
+        PATCH = 0   # Reset Patch
     elif semver.position == 'PATCH':
         PATCH = PATCH + 1
 

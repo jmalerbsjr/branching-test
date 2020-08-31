@@ -124,16 +124,16 @@ def semver_bump(src_branch, dest_branch):
 
 def mh_config(mode='live', src_branch=None, dest_branch=None):
     mh_config_model = MhConfigModel()
-    print(os.environ["INPUT_GITHUB_CONTEXT"])
-    exit(0)
 
     if mode == 'live':
         print("{0} MODE: Loading config from Github Secrets and ENV Variables".format(mode.upper()))
-        mh_config_model.src_branch = os.environ["GITHUB_REF"].split('/')[2]
-        mh_config_model.dest_branch = 'development'
+
+        mh_config_model.src_branch = os.environ["INPUT_SRC_BRANCH"]
+        mh_config_model.dest_branch = os.environ["GITHUB_REF"].split('/')[2]
         mh_config_model.github_api_token = os.environ["INPUT_REPO-TOKEN"]
 
-        print("Source Branch:", mh_config_model.dest_branch, "Destination Branch:", mh_config_model.dest_branch, "API Repo Token: From Github Secrets")
+        print("Source Branch:", mh_config_model.src_branch, "\nDestination Branch:", mh_config_model.dest_branch, "\nAPI Repo Token: From Github Secrets")
+        # print(os.environ["INPUT_GITHUB_CONTEXT"])
 
     elif mode == 'local':
         # Read configs from file and function input parameters
@@ -152,10 +152,9 @@ def mh_config(mode='live', src_branch=None, dest_branch=None):
         mh_config_model.src_branch = src_branch
         mh_config_model.dest_branch = dest_branch
 
-        print("Source Branch:", mh_config_model.dest_branch, "Destination Branch:", mh_config_model.dest_branch,
+        print("Source Branch:", mh_config_model.src_branch, "Destination Branch:", mh_config_model.dest_branch,
               "API Repo Token: From Github Secrets")
-    print(os.environ)
-    exit(0)
+
     return mh_config_model
 
 
@@ -191,31 +190,38 @@ def push_github_tag(repo_name, dest_branch, tag_next):
 # mh_config = mh_config(mode='local', src_branch='feature', dest_branch='development')
 mh_config = mh_config(mode='live')
 # ------------------------------
+
 semver = SemVerModel(repo_name="branching-test",
                      src_branch=mh_config.src_branch,
                      dest_branch=mh_config.dest_branch)
-
-# Instantiate GitHub connection object
+#
+# # Instantiate GitHub connection object
 gh_api = connect_github(api_token=mh_config.github_api_token)
 
-# Get tags from Github
-tags = get_github_tags(repo_name=semver.repo_name)
+# repo = gh_api.get_user().get_repo('branching-test')
+# print(repo.get)
+# print(repo.get_branch('feature123').commit)
 
-# Get latest tag from branch
-get_latest_tags(git_tags=tags)
-
-# Generate new tag
-semver.tag_next = semver_bump(src_branch=semver.src_branch,
-                              dest_branch=semver.dest_branch)
-
-push_github_tag(repo_name=semver.repo_name,
-                dest_branch=semver.dest_branch,
-                tag_next=semver.tag_next)
+#
+# # Get tags from Github
+# tags = get_github_tags(repo_name=semver.repo_name)
+#
+# # Get latest tag from branch
+# get_latest_tags(git_tags=tags)
+#
+# # Generate new tag
+# semver.tag_next = semver_bump(src_branch=semver.src_branch,
+#                               dest_branch=semver.dest_branch)
+#
+# push_github_tag(repo_name=semver.repo_name,
+#                 dest_branch=semver.dest_branch,
+#                 tag_next=semver.tag_next)
 
 # print("::set-output name=tag_new::{0}".format(semver.tag_next))
 
 '''
 TODO:
+- Set src and dest branch names 
 - Update release body message
 - Flag for local testing
 - PR checkbox to bump MAJOR, MINOR

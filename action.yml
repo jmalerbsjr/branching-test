@@ -5,6 +5,9 @@ inputs:
   repo-token:  # id of input
     description: 'Who to greet'
     required: true
+  GITHUB_CONTEXT:  # id of input
+    description: 'Who to greet'
+    required: true
 outputs:
   tag_new: # id of output
     description: 'Test output'

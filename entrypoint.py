@@ -124,6 +124,8 @@ def semver_bump(src_branch, dest_branch):
 
 def mh_config(mode='live', src_branch=None, dest_branch=None):
     mh_config_model = MhConfigModel()
+    print(os.environ["INPUT_GITHUB_CONTEXT"])
+    exit(0)
 
     if mode == 'live':
         print("{0} MODE: Loading config from Github Secrets and ENV Variables".format(mode.upper()))

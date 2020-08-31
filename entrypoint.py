@@ -128,7 +128,7 @@ def mh_config(mode='live', src_branch=None, dest_branch=None):
     if mode == 'live':
         print("{0} MODE: Loading config from Github Secrets and ENV Variables".format(mode.upper()))
         mh_config_model.src_branch = os.environ["GITHUB_REF"].split('/')[2]
-        mh_config_model.dest_branch = os.environ["GITHUB_BASE_REF"].split('/')[2]
+        mh_config_model.dest_branch = 'development'
         mh_config_model.github_api_token = os.environ["INPUT_REPO-TOKEN"]
 
         print("Source Branch:", mh_config_model.dest_branch, "Destination Branch:", mh_config_model.dest_branch, "API Repo Token: From Github Secrets")
@@ -152,7 +152,8 @@ def mh_config(mode='live', src_branch=None, dest_branch=None):
 
         print("Source Branch:", mh_config_model.dest_branch, "Destination Branch:", mh_config_model.dest_branch,
               "API Repo Token: From Github Secrets")
-
+    print(os.environ)
+    exit(0)
     return mh_config_model
 
 

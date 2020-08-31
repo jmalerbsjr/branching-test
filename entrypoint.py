@@ -15,24 +15,32 @@ class SemVerModel(object):
     def __init__(self, repo_name,
                  src_branch = None,
                  dest_branch = None,
-                 position = None,
-                 tag_suffix = None,
-                 tag_latest = None,
                  tag_latest_nosuffix=None,
-                 tag_meta = None,
-                 tag_next = None):
+                 tag_next=None,
+                 tag_meta = None):
+
         self.repo_name = repo_name
         self.src_branch = src_branch
         self.dest_branch = dest_branch
-        self.position = position
-        self.tag_suffix = tag_suffix
-        self.tag_latest = tag_latest
         self.tag_latest_nosuffix = tag_latest_nosuffix
-        self.tag_meta = {"development":
-                             {"tag_suffix": "-dev"},
-                         "master":
-                             {"tag_suffix": ""} }
         self.tag_next = tag_next
+        self.tag_meta = {"development":
+                             [
+                                 {"tag_latest": None,
+                                 "tag_latest_nosuffix": None,
+                                 "tag_suffix": "-dev",
+                                 "prerelease": True
+                                 }
+                             ],
+                         "master":
+                             [
+                                 {"tag_latest": None,
+                                 "tag_latest_nosuffix": None,
+                                 "tag_suffix": "",
+                                 "prerelease": False
+                                 }
+                             ]
+                         }
 
 
 class MhConfigModel(object):
@@ -45,7 +53,7 @@ def connect_github(api_token):
     return Github(base_url="https://api.github.com", login_or_token=api_token)
 
 
-def get_github_tags(repo_name=None, gh_api=None):
+def get_github_tags(repo_name=None):
     print("Get tags from GitHub")
 
     # Get tags from GitHub as a list
@@ -54,53 +62,54 @@ def get_github_tags(repo_name=None, gh_api=None):
     return [tag.name for tag in git_tags]
 
 
-def get_semver_position():
-    # Determine which semantic position to bump
-    if semver.dest_branch == 'development':
-        position = 'MINOR'
-        print("Position: {0}".format(position))
+def get_latest_tags(git_tags):
+    # Get latest tag for each branch and set values in semver.tag_meta
+    print("Find latest tags")
 
-        return position
+    for branch in semver.tag_meta:
+        # Set tag suffix for given branch
+        tag_suffix = semver.tag_meta[branch][0]['tag_suffix']
+
+        for tag in git_tags:
+            regex = re.search(r'(\d+\.\d+\.\d+){0}$'.format(tag_suffix), tag)
+            if regex:
+                # Set latest tag values with and without tag suffix
+                semver.tag_meta[branch][0]['tag_latest'] = tag
+                semver.tag_meta[branch][0]['tag_latest_nosuffix'] = regex.group(1)
+                print('({0}): {1}'.format(branch, tag))
+
+                break
 
 
-def get_latest_tag(git_tags, dest_branch, tag_suffix):
-    for tag in git_tags:
-        if re.search(r'{0}$'.format(tag_suffix), tag):
-            print('Latest tag ({0}): {1}'.format(dest_branch, tag))
-
-            return tag
-
-
-def semver_bump(tag_latest, tag_suffix):
+def semver_bump(src_branch, dest_branch):
     print("Generate New Version")
+    print("Src to Dest Branch: {0} --> {1}".format(src_branch, dest_branch))
 
-    # Remove tag suffix
-    if tag_suffix != '':
-        semver.tag_latest_nosuffix = tag_latest.split("-")[0]
-        tag = semver.tag_latest_nosuffix
-    else:
-        tag = tag_latest
+    if dest_branch == 'development' and src_branch not in ("master", "hotfix"):
+        # Commit feature to development branch, MINOR bump
+        # Bump Minor position - Example: development @1.2.0-dev --> @1.3.0-dev
 
-    # Convert semantic version (without suffix) to integers
-    MAJOR = int(tag.split(".")[0])
-    MINOR = int(tag.split(".")[1])
-    PATCH = int(tag.split(".")[2])
+        tag_latest = semver.tag_meta['development'][0]['tag_latest']
+        tag_latest_nosuffix = semver.tag_meta['development'][0]['tag_latest_nosuffix']
+        tag_suffix = semver.tag_meta['development'][0]['tag_suffix']
 
-    if semver.position == 'MAJOR':
-        MAJOR = MAJOR + 1
-    elif semver.position == 'MINOR':
+        # Convert semantic version (without suffix) to integers
+        MAJOR = int(tag_latest_nosuffix.split(".")[0])
+        MINOR = int(tag_latest_nosuffix.split(".")[1])
+        PATCH = int(tag_latest_nosuffix.split(".")[2])
+
+        # Bump version
         MINOR = MINOR + 1
-        PATCH = 0   # Reset Patch
-    elif semver.position == 'PATCH':
-        PATCH = PATCH + 1
+        PATCH = 0  # Reset Patch
 
-    # Assemble full semantic version, reattaching suffix if applicable
-    if tag_suffix != '':
-        tag_next = "{0}.{1}.{2}{3}".format(MAJOR, MINOR, PATCH, semver.tag_suffix)
-    else:
-        tag_next = "{0}.{1}.{2}".format(MAJOR, MINOR, PATCH)
+        tag_next = "{0}.{1}.{2}{3}".format(MAJOR, MINOR, PATCH, tag_suffix)
 
-    print("New Version: {0}".format(tag_next))
+    elif dest_branch == 'master' and src_branch in ("development"):
+        # Retain version, drop suffix. No version bump
+        # Example: development @1.2.0-dev --> master @1.2.0
+
+        tag_latest_nosuffix = semver.tag_meta['development'][0]['tag_latest_nosuffix']
+        tag_next = tag_latest_nosuffix
 
     return tag_next
 
@@ -129,7 +138,7 @@ def mh_config(mode='live'):
     return mh_config_model
 
 
-def push_github_tag(repo_name, dest_branch, tag_next, gh_api):
+def push_github_tag(repo_name, tag_next):
     # https://stackoverflow.com/questions/11801983/how-to-create-a-commit-and-push-into-repo-with-github-api-v3
 
     # Instantiate a Github object
@@ -139,63 +148,58 @@ def push_github_tag(repo_name, dest_branch, tag_next, gh_api):
     git_branch = repo.get_branch(branch=dest_branch)
 
     # Push next tag to repository
+    prerelease = semver.tag_meta[dest_branch][0]['prerelease']
+    print('New tag: {0}\nSHA: {1}\nOn Branch: {2}\nPrerelease: {3}'.format(tag_next,
+                                                                           git_branch.commit.sha,
+                                                                           dest_branch,
+                                                                           prerelease))
+
     repo.create_git_tag_and_release(tag=tag_next,
                                     tag_message='Test Message',
                                     release_name='Test Release Name',
                                     release_message='Test Release Message',
                                     object=git_branch.commit.sha,
                                     type='commit',
-                                    prerelease=True)
+                                    prerelease=prerelease)
 
-    print('New tag: {0}\nSHA: {1}\nOn Branch: {2}'.format(tag_next,
-                                                          git_branch.commit.sha,
-                                                          dest_branch))
 
-# ---- INPUTS ----
-# src_branch = os.environ["GITHUB_REF"].split('/')[2]     # Ex: feat_branch
-src_branch = "feature_branch"     # Ex: feat_branch
-dest_branch = 'development'
+
+# ---- Local Testing INPUTS ----
 
 # Set mode: Local (local config) or Live (GitHub Secrets)
-mh_config = mh_config(mode='live')
+mh_config = mh_config(mode='local')
 
 # Instantiate GitHub connection object
 gh_api = connect_github(api_token=mh_config.github_api_token)
 
 # Instantiate data model
+# src_branch = os.environ["GITHUB_REF"].split('/')[2]
+src_branch = 'development'
+dest_branch = 'master'
+
 semver = SemVerModel(repo_name="branching-test",
                      src_branch=src_branch,
                      dest_branch=dest_branch)
 
 # Get tags from Github
-tags = get_github_tags(repo_name=semver.repo_name,
-                       gh_api=gh_api)
-
-# Output latest tag ending associated branch suffix
-semver.tag_suffix = semver.tag_meta[dest_branch]['tag_suffix']
+tags = get_github_tags(repo_name=semver.repo_name)
 
 # Get latest tag from branch
-semver.tag_latest = get_latest_tag(git_tags=tags,
-                                   dest_branch=semver.dest_branch,
-                                   tag_suffix=semver.tag_suffix)
-
-# Figure out which semantic position to bump
-semver.position = get_semver_position()
+get_latest_tags(git_tags=tags)
 
 # Generate new tag
-semver.tag_next = semver_bump(tag_latest=semver.tag_latest,
-                              tag_suffix=semver.tag_suffix)
-print("::set-output name=tag_new::{0}".format(semver.tag_next))
+semver.tag_next = semver_bump(src_branch=semver.src_branch,
+                              dest_branch=semver.dest_branch)
 
 push_github_tag(repo_name=semver.repo_name,
-                dest_branch=semver.dest_branch,
-                tag_next=semver.tag_next,
-                gh_api=gh_api)
+                tag_next=semver.tag_next)
 
+# print("::set-output name=tag_new::{0}".format(semver.tag_next))
 
 '''
 TODO:
-- Master, hotfix branches
+- Update release body message
+- Flag for local testing
 - PR checkbox to bump MAJOR, MINOR
-- Flag prerelease or real release
+- Hotfix branches
 '''

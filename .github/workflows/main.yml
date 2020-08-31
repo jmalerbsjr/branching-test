@@ -1,0 +1,27 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Release Versioning
+
+# Triggers the workflow on push or pull request
+on:
+  push:
+    branches: [ development ]
+
+jobs:
+  version_bump:
+    runs-on: ubuntu-latest
+    name: Version Bump
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Docker Bump Version
+        uses: ./ # Uses an action in the root directory
+        id: hello
+        with:
+          repo-token: ${{ secrets.API_KEY_REPO_BRANCH_TEST }}
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+      # Use the output from the `hello` step
+#      - name: Bump Version
+#        run: |
+#          echo "New Version: ${{ steps.hello.outputs.tag_new }}"

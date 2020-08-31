@@ -1,0 +1,18 @@
+# action.yml
+name: 'Hello World'
+description: 'Greet someone and record the time'
+inputs:
+  repo-token:  # id of input
+    description: 'Who to greet'
+    required: true
+  GITHUB_CONTEXT:  # id of input
+    description: 'Who to greet'
+    required: true
+outputs:
+  tag_new: # id of output
+    description: 'Test output'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - 'Mona the Octocat'

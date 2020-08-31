@@ -12,6 +12,10 @@ jobs:
     runs-on: ubuntu-latest
     name: Version Bump
     steps:
+      # Get source branch name
+      - uses: nelonoel/branch-name@v1
+      - run: echo ::set-env name=SRC_BRANCH::${BRANCH_NAME}
+
       - name: Checkout
         uses: actions/checkout@v2
 
@@ -21,6 +25,7 @@ jobs:
         with:
           repo-token: ${{ secrets.API_KEY_REPO_BRANCH_TEST }}
           GITHUB_CONTEXT: ${{ toJson(github) }}
+          SRC_BRANCH: ${{ env.SRC_BRANCH }}
       # Use the output from the `hello` step
 #      - name: Bump Version
 #        run: |

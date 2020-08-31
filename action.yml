@@ -8,6 +8,9 @@ inputs:
   GITHUB_CONTEXT:  # id of input
     description: 'Who to greet'
     required: true
+  SRC_BRANCH:  # id of input
+    description: 'Who to greet'
+    required: true
 outputs:
   tag_new: # id of output
     description: 'Test output'

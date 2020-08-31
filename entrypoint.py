@@ -127,13 +127,13 @@ def mh_config(mode='live', src_branch=None, dest_branch=None):
 
     if mode == 'live':
         print("{0} MODE: Loading config from Github Secrets and ENV Variables".format(mode.upper()))
-        print(os.environ["INPUT_GITHUB_CONTEXT"])
 
-        mh_config_model.src_branch = 'SOURCE-BRANCH'
+        mh_config_model.src_branch = os.environ["INPUT_SRC_BRANCH"]
         mh_config_model.dest_branch = os.environ["GITHUB_REF"].split('/')[2]
         mh_config_model.github_api_token = os.environ["INPUT_REPO-TOKEN"]
 
-        print("Source Branch:", mh_config_model.src_branch, "Destination Branch:", mh_config_model.dest_branch, "API Repo Token: From Github Secrets")
+        print("Source Branch:", mh_config_model.src_branch, "\nDestination Branch:", mh_config_model.dest_branch, "\nAPI Repo Token: From Github Secrets")
+        # print(os.environ["INPUT_GITHUB_CONTEXT"])
 
     elif mode == 'local':
         # Read configs from file and function input parameters
@@ -152,7 +152,7 @@ def mh_config(mode='live', src_branch=None, dest_branch=None):
         mh_config_model.src_branch = src_branch
         mh_config_model.dest_branch = dest_branch
 
-        print("Source Branch:", mh_config_model.dest_branch, "Destination Branch:", mh_config_model.dest_branch,
+        print("Source Branch:", mh_config_model.src_branch, "Destination Branch:", mh_config_model.dest_branch,
               "API Repo Token: From Github Secrets")
 
     return mh_config_model
@@ -190,12 +190,18 @@ def push_github_tag(repo_name, dest_branch, tag_next):
 # mh_config = mh_config(mode='local', src_branch='feature', dest_branch='development')
 mh_config = mh_config(mode='live')
 # ------------------------------
-# semver = SemVerModel(repo_name="branching-test",
-#                      src_branch=mh_config.src_branch,
-#                      dest_branch=mh_config.dest_branch)
+
+semver = SemVerModel(repo_name="branching-test",
+                     src_branch=mh_config.src_branch,
+                     dest_branch=mh_config.dest_branch)
 #
 # # Instantiate GitHub connection object
-# gh_api = connect_github(api_token=mh_config.github_api_token)
+gh_api = connect_github(api_token=mh_config.github_api_token)
+
+# repo = gh_api.get_user().get_repo('branching-test')
+# print(repo.get)
+# print(repo.get_branch('feature123').commit)
+
 #
 # # Get tags from Github
 # tags = get_github_tags(repo_name=semver.repo_name)
@@ -215,6 +221,7 @@ mh_config = mh_config(mode='live')
 
 '''
 TODO:
+- Set src and dest branch names 
 - Update release body message
 - Flag for local testing
 - PR checkbox to bump MAJOR, MINOR

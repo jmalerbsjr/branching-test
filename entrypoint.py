@@ -45,7 +45,15 @@ class SemVerModel(object):
 
 class MhConfigModel(object):
 
-    def __init__(self, github_api_token=None):
+    def __init__(self,
+                 mode='live',
+                 src_branch=None,
+                 dest_branch=None,
+                 github_api_token=None):
+
+        self.mode = mode
+        self.src_branch = src_branch
+        self.dest_branch = dest_branch
         self.github_api_token = github_api_token
 
 
@@ -114,13 +122,19 @@ def semver_bump(src_branch, dest_branch):
     return tag_next
 
 
-def mh_config(mode='live'):
+def mh_config(mode='live', src_branch=None, dest_branch=None):
     mh_config_model = MhConfigModel()
 
-    if mode == 'local':
+    if mode == 'live':
+        print("{0} MODE: Loading config from Github Secrets".format(mode.upper()))
+        mh_config_model.src_branch = os.environ["GITHUB_REF"].split('/')[2]
+        mh_config_model.dest_branch = 'development'
+        mh_config_model.github_api_token = os.environ["INPUT_REPO-TOKEN"]
+
+    elif mode == 'local':
         # Read configs from file
         path = '{0}/.meethook/config.txt'.format(os.environ["HOME"])
-        print("Loading config from path: {0}".format(path))
+        print("{0} MODE: Loading config from path: {1}".format(mode.upper(), path))
 
         file = open(path, 'r')
         for line in file:
@@ -130,15 +144,14 @@ def mh_config(mode='live'):
                 mh_config_model.github_api_token = value
         file.close()
 
-    if mode == 'live':
-        print("Loading config from Github Secrets")
-        mh_config_model.github_api_token = os.environ["INPUT_REPO-TOKEN"]
-
+        # Set source and destination TEST branches
+        mh_config_model.src_branch = src_branch
+        mh_config_model.dest_branch = dest_branch
 
     return mh_config_model
 
 
-def push_github_tag(repo_name, tag_next):
+def push_github_tag(repo_name, dest_branch, tag_next):
     # https://stackoverflow.com/questions/11801983/how-to-create-a-commit-and-push-into-repo-with-github-api-v3
 
     # Instantiate a Github object
@@ -154,32 +167,28 @@ def push_github_tag(repo_name, tag_next):
                                                                            dest_branch,
                                                                            prerelease))
 
-    repo.create_git_tag_and_release(tag=tag_next,
-                                    tag_message='Test Message',
-                                    release_name='Test Release Name',
-                                    release_message='Test Release Message',
-                                    object=git_branch.commit.sha,
-                                    type='commit',
-                                    prerelease=prerelease)
+    # repo.create_git_tag_and_release(tag=tag_next,
+    #                                 tag_message='Test Message',
+    #                                 release_name='Test Release Name',
+    #                                 release_message='Test Release Message',
+    #                                 object=git_branch.commit.sha,
+    #                                 type='commit',
+    #                                 prerelease=prerelease)
+
 
 
 
 # ---- Local Testing INPUTS ----
-
 # Set mode: Local (local config) or Live (GitHub Secrets)
-mh_config = mh_config(mode='local')
+# mh_config = mh_config(mode='local', src_branch='feature', dest_branch='development')
+mh_config = mh_config(mode='live')
+# ------------------------------
+semver = SemVerModel(repo_name="branching-test",
+                     src_branch=mh_config.src_branch,
+                     dest_branch=mh_config.dest_branch)
 
 # Instantiate GitHub connection object
 gh_api = connect_github(api_token=mh_config.github_api_token)
-
-# Instantiate data model
-# src_branch = os.environ["GITHUB_REF"].split('/')[2]
-src_branch = 'development'
-dest_branch = 'master'
-
-semver = SemVerModel(repo_name="branching-test",
-                     src_branch=src_branch,
-                     dest_branch=dest_branch)
 
 # Get tags from Github
 tags = get_github_tags(repo_name=semver.repo_name)
@@ -192,6 +201,7 @@ semver.tag_next = semver_bump(src_branch=semver.src_branch,
                               dest_branch=semver.dest_branch)
 
 push_github_tag(repo_name=semver.repo_name,
+                dest_branch=semver.dest_branch,
                 tag_next=semver.tag_next)
 
 # print("::set-output name=tag_new::{0}".format(semver.tag_next))
@@ -202,4 +212,7 @@ TODO:
 - Flag for local testing
 - PR checkbox to bump MAJOR, MINOR
 - Hotfix branches
+
+IMPLEMENTATION STEPS
+- Create repo secret REPO-TOKEN
 '''

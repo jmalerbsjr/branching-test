@@ -126,15 +126,17 @@ def mh_config(mode='live', src_branch=None, dest_branch=None):
     mh_config_model = MhConfigModel()
 
     if mode == 'live':
-        print("{0} MODE: Loading config from Github Secrets".format(mode.upper()))
+        print("{0} MODE: Loading config from Github Secrets and ENV Variables".format(mode.upper()))
         mh_config_model.src_branch = os.environ["GITHUB_REF"].split('/')[2]
-        mh_config_model.dest_branch = 'development'
+        mh_config_model.dest_branch = os.environ["GITHUB_BASE_REF"].split('/')[2]
         mh_config_model.github_api_token = os.environ["INPUT_REPO-TOKEN"]
 
+        print("Source Branch:", mh_config_model.dest_branch, "Destination Branch:", mh_config_model.dest_branch, "API Repo Token: From Github Secrets")
+
     elif mode == 'local':
-        # Read configs from file
+        # Read configs from file and function input parameters
         path = '{0}/.meethook/config.txt'.format(os.environ["HOME"])
-        print("{0} MODE: Loading config from path: {1}".format(mode.upper(), path))
+        print("{0} MODE: Loading values from path: {1}".format(mode.upper(), path))
 
         file = open(path, 'r')
         for line in file:
@@ -147,6 +149,9 @@ def mh_config(mode='live', src_branch=None, dest_branch=None):
         # Set source and destination TEST branches
         mh_config_model.src_branch = src_branch
         mh_config_model.dest_branch = dest_branch
+
+        print("Source Branch:", mh_config_model.dest_branch, "Destination Branch:", mh_config_model.dest_branch,
+              "API Repo Token: From Github Secrets")
 
     return mh_config_model
 

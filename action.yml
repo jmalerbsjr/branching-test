@@ -1,5 +1,5 @@
 # action.yml
-name: 'Hello World'
+name: 'Docker Action File'
 description: 'Greet someone and record the time'
 inputs:
   repo-token:  # id of input

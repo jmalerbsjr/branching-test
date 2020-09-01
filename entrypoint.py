@@ -187,37 +187,34 @@ def push_github_tag(repo_name, dest_branch, tag_next):
 
 # ---- Local Testing INPUTS ----
 # Set mode: Local (local config) or Live (GitHub Secrets)
-# mh_config = mh_config(mode='local', src_branch='feature', dest_branch='development')
-mh_config = mh_config(mode='live')
+mh_config = mh_config(mode='local', src_branch='feature', dest_branch='development')
+# mh_config = mh_config(mode='live')
 # ------------------------------
 
 semver = SemVerModel(repo_name="branching-test",
                      src_branch=mh_config.src_branch,
                      dest_branch=mh_config.dest_branch)
-#
-# # Instantiate GitHub connection object
+
+# Instantiate GitHub connection object
 gh_api = connect_github(api_token=mh_config.github_api_token)
 
-# repo = gh_api.get_user().get_repo('branching-test')
-# print(repo.get)
-# print(repo.get_branch('feature123').commit)
+repo = gh_api.get_user().get_repo('branching-test')
 
-#
-# # Get tags from Github
-# tags = get_github_tags(repo_name=semver.repo_name)
-#
-# # Get latest tag from branch
-# get_latest_tags(git_tags=tags)
-#
-# # Generate new tag
-# semver.tag_next = semver_bump(src_branch=semver.src_branch,
-#                               dest_branch=semver.dest_branch)
-#
-# push_github_tag(repo_name=semver.repo_name,
-#                 dest_branch=semver.dest_branch,
-#                 tag_next=semver.tag_next)
+# Get tags from Github
+tags = get_github_tags(repo_name=semver.repo_name)
 
-# print("::set-output name=tag_new::{0}".format(semver.tag_next))
+# Get latest tag from branch
+get_latest_tags(git_tags=tags)
+
+# Generate new tag
+semver.tag_next = semver_bump(src_branch=semver.src_branch,
+                              dest_branch=semver.dest_branch)
+
+push_github_tag(repo_name=semver.repo_name,
+                dest_branch=semver.dest_branch,
+                tag_next=semver.tag_next)
+
+print("::set-output name=tag_new::{0}".format(semver.tag_next))
 
 '''
 TODO:

@@ -1,11 +1,14 @@
 # action.yml
-name: 'Hello World'
+name: 'Docker Action File'
 description: 'Greet someone and record the time'
 inputs:
   repo-token:  # id of input
     description: 'Who to greet'
     required: true
   GITHUB_CONTEXT:  # id of input
+    description: 'Who to greet'
+    required: true
+  SRC_BRANCH:  # id of input
     description: 'Who to greet'
     required: true
 outputs:

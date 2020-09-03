@@ -193,8 +193,8 @@ def push_github_tag(repo_name, dest_branch, tag_next):
 
 # ---- Local Testing INPUTS ----
 # Set mode: Local (local config) or Live (GitHub Secrets)
-# mh_config = mh_config(mode='local', dest_branch='master')
-mh_config = mh_config(mode='live')
+mh_config = mh_config(mode='local', dest_branch='master')
+# mh_config = mh_config(mode='live')
 # ------------------------------
 semver = SemVerModel(repo_name="branching-test",
                      dest_branch=mh_config.dest_branch)

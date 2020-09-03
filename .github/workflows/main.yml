@@ -5,7 +5,9 @@ name: Release Versioning
 # Triggers the workflow on push or pull request
 on:
   push:
-    branches: [ development ]
+    branches:
+      - development
+      - master
 
 jobs:
   version_bump:

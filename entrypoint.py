@@ -180,20 +180,20 @@ def push_github_tag(repo_name, dest_branch, tag_next):
                                                                            dest_branch,
                                                                            prerelease))
 
-    # repo.create_git_tag_and_release(tag=tag_next,
-    #                                 tag_message='Test Message',
-    #                                 release_name='Test Release Name',
-    #                                 release_message='Test Release Message',
-    #                                 object=git_branch.commit.sha,
-    #                                 type='commit',
-    #                                 prerelease=prerelease)
+    repo.create_git_tag_and_release(tag=tag_next,
+                                    tag_message='Test Message',
+                                    release_name='Test Release Name',
+                                    release_message='Test Release Message',
+                                    object=git_branch.commit.sha,
+                                    type='commit',
+                                    prerelease=prerelease)
 
 
 
 
 # ---- Local Testing INPUTS ----
 # Set mode: Local (local config) or Live (GitHub Secrets)
-# mh_config = mh_config(mode='local', dest_branch='development')
+# mh_config = mh_config(mode='local', dest_branch='master')
 mh_config = mh_config(mode='live')
 # ------------------------------
 semver = SemVerModel(repo_name="branching-test",

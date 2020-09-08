@@ -1,0 +1,17 @@
+# action.yml
+name: 'Docker Action'
+description: 'Version bump'
+inputs:
+  REPO-TOKEN:
+    description: 'Repository token for auth'
+    required: true
+  REPO-NAME:
+    description: 'Repository token for auth'
+    required: true
+#outputs:
+#  tag_new: # id of output
+#    description: 'Test output'
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'

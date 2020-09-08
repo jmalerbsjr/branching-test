@@ -2,7 +2,7 @@
 
 name: Release Versioning
 
-# Triggers the workflow on push or pull request
+# Triggers the workflow on push
 on:
   push:
     branches:
@@ -14,21 +14,14 @@ jobs:
     runs-on: ubuntu-latest
     name: Version Bump
     steps:
-      # Get source branch name
-      - uses: nelonoel/branch-name@v1
-      - run: echo ::set-env name=SRC_BRANCH::${BRANCH_NAME}
-
+     # Checkout code
       - name: Checkout
         uses: actions/checkout@v2
 
+     # Run Docker container via GitHub Actions
       - name: Docker Bump Version
-        uses: ./ # Uses an action in the root directory
+        uses: ./.github/actions/
         id: docker_run
         with:
-          repo-token: ${{ secrets.API_KEY_REPO_BRANCH_TEST }}
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-          SRC_BRANCH: ${{ env.SRC_BRANCH }}
-      # Use the output from the `hello` step
-#      - name: Bump Version
-#        run: |
-#          echo "New Version: ${{ steps.hello.outputs.tag_new }}"
+          REPO-TOKEN: ${{ secrets.API_KEY_REPO_BRANCH_TEST }}
+          REPO-NAME: ${{github.repository}}
